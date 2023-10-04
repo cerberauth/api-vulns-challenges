@@ -31,7 +31,7 @@ func RunServer() {
 			}
 
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 
 			return []byte("my_secret_key"), nil
@@ -45,6 +45,5 @@ func RunServer() {
 		}
 	})
 
-	log.Println("starting server")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
