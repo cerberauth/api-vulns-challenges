@@ -1,4 +1,4 @@
-module github.com/cerberauth/vulns-challenges/challenges/jwt-weak-hmac-secret
+module github.com/cerberauth/api-vulns-challenges/challenges/jwt-weak-hmac-secret
 
 go 1.20
 

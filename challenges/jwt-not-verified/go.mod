@@ -1,4 +1,4 @@
-module github.com/cerberauth/vulns-challenges/challenges/jwt-not-verified
+module github.com/cerberauth/api-vulns-challenges/challenges/jwt-not-verified
 
 go 1.20
 

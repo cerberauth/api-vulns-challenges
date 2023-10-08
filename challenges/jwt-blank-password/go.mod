@@ -1,4 +1,4 @@
-module github.com/cerberauth/vulns-challenges/challenges/jwt-blank-password
+module github.com/cerberauth/api-vulns-challenges/challenges/jwt-blank-password
 
 go 1.20
 

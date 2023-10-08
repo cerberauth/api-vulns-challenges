@@ -1,4 +1,4 @@
-module github.com/cerberauth/vulns-challenges/challenges/jwt-alg-none-bypass
+module github.com/cerberauth/api-vulns-challenges/challenges/jwt-alg-none-bypass
 
 go 1.20
 

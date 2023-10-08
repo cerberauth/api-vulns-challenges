@@ -3,8 +3,8 @@ package cmd
 import (
 	"os"
 
-	"github.com/cerberauth/vulns-challenges/challenges/jwt-alg-none-bypass/cmd/jwt"
-	"github.com/cerberauth/vulns-challenges/challenges/jwt-alg-none-bypass/cmd/serve"
+	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-alg-none-bypass/cmd/jwt"
+	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-alg-none-bypass/cmd/serve"
 
 	"github.com/spf13/cobra"
 )
