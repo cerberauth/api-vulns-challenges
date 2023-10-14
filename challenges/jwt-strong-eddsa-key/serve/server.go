@@ -45,6 +45,11 @@ func RunServer() {
 		}
 
 		tokenString := strings.TrimSpace(headerParts[1])
+		if len(tokenString) == 0 {
+			w.WriteHeader(401)
+			return
+		}
+
 		parts := strings.Split(tokenString, ".")
 		sig, err := jwt.NewParser().DecodeSegment(parts[2])
 		if err != nil {

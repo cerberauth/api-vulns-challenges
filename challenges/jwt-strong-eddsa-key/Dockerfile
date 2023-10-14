@@ -7,17 +7,17 @@ RUN go mod download
 
 COPY . ./
 
-RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -o /jwt-strong-eddsa-key .
+RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -o /jwt-null-signature .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 
 WORKDIR /
 
-COPY --from=builder --chown=nonroot:nonroot /jwt-strong-eddsa-key /usr/bin/jwt-strong-eddsa-key
+COPY --from=builder --chown=nonroot:nonroot /jwt-null-signature /usr/bin/jwt-null-signature
 
 EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["jwt-strong-eddsa-key", "serve"]
-CMD ["jwt-strong-eddsa-key"]
+ENTRYPOINT ["jwt-null-signature", "serve"]
+CMD ["jwt-null-signature"]

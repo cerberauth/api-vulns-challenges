@@ -1,4 +1,4 @@
-module github.com/cerberauth/api-vulns-challenges/challenges/jwt-strong-eddsa-key
+module github.com/cerberauth/api-vulns-challenges/challenges/jwt-null-signature
 
 go 1.20
 

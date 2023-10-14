@@ -3,8 +3,8 @@ package cmd
 import (
 	"os"
 
-	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-strong-eddsa-key/cmd/jwt"
-	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-strong-eddsa-key/cmd/serve"
+	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-null-signature/cmd/jwt"
+	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-null-signature/cmd/serve"
 
 	"github.com/spf13/cobra"
 )
