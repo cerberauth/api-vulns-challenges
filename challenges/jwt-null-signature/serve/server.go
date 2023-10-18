@@ -62,7 +62,7 @@ func RunServer() {
 			return
 		}
 
-		err = jwt.GetSigningMethod("EdDSA").Verify(strings.Join(parts[0:2], "."), sig, publicKey)
+		err = jwt.GetSigningMethod(jwt.SigningMethodEdDSA.Alg()).Verify(strings.Join(parts[0:2], "."), sig, publicKey)
 		if err == nil {
 			w.WriteHeader(204)
 		} else {
