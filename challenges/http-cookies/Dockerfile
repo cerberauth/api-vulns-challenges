@@ -7,17 +7,17 @@ RUN go mod download
 
 COPY . ./
 
-RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -o /jwt-alg-none-bypass .
+RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -o /http-cookies .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 
 WORKDIR /
 
-COPY --from=builder --chown=nonroot:nonroot /jwt-alg-none-bypass /usr/bin/jwt-alg-none-bypass
+COPY --from=builder --chown=nonroot:nonroot /http-cookies /usr/bin/http-cookies
 
 EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["jwt-alg-none-bypass", "serve"]
-CMD ["jwt-alg-none-bypass"]
+ENTRYPOINT ["http-cookies", "serve"]
+CMD ["http-cookies"]
