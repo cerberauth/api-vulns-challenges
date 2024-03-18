@@ -19,5 +19,5 @@ EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["jwt-weak-rsa-key", "serve"]
-CMD ["jwt-weak-rsa-key"]
+ENTRYPOINT ["jwt-weak-rsa-key"]
+CMD ["serve"]

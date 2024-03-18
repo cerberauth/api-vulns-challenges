@@ -19,5 +19,5 @@ EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["jwt-weak-hmac-secret", "serve"]
-CMD ["jwt-weak-hmac-secret"]
+ENTRYPOINT ["jwt-weak-hmac-secret"]
+CMD ["serve"]
