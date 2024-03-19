@@ -18,7 +18,7 @@ func NewJwtCmd() (jwtCmd *cobra.Command) {
 				log.Fatal(err)
 			}
 
-			fmt.Printf("Token example: %s", tokenString)
+			fmt.Print(tokenString)
 		},
 	}
 
