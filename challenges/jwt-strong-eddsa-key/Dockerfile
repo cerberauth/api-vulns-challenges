@@ -19,5 +19,5 @@ EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["jwt-strong-eddsa-key", "serve"]
-CMD ["jwt-strong-eddsa-key"]
+ENTRYPOINT ["jwt-strong-eddsa-key"]
+CMD ["serve"]

@@ -19,5 +19,5 @@ EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["http-cookies", "serve"]
-CMD ["http-cookies"]
+ENTRYPOINT ["http-cookies"]
+CMD ["serve"]
