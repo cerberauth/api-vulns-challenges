@@ -19,5 +19,5 @@ EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["jwt-alg-none-bypass", "serve"]
-CMD ["jwt-alg-none-bypass"]
+ENTRYPOINT ["jwt-alg-none-bypass"]
+CMD ["serve"]

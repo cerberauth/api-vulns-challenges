@@ -19,5 +19,5 @@ EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["jwt-not-verified", "serve"]
-CMD ["jwt-not-verified"]
+ENTRYPOINT ["jwt-not-verified"]
+CMD ["serve"]

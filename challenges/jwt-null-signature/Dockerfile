@@ -19,5 +19,5 @@ EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["jwt-null-signature", "serve"]
-CMD ["jwt-null-signature"]
+ENTRYPOINT ["jwt-null-signature"]
+CMD ["serve"]

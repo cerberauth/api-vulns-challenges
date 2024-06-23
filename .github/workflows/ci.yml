@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
+      contents: read
       packages: write
 
     strategy:
@@ -53,3 +54,28 @@ jobs:
           tags: ghcr.io/cerberauth/api-vulns-challenges/${{ matrix.challenge }}:latest
           cache-from: type=registry,ref=ghcr.io/cerberauth/api-vulns-challenges/${{ matrix.challenge }}:latest
           cache-to: type=inline
+
+      - name: Run Server
+        run: docker run -d -p 8080:8080 ghcr.io/cerberauth/api-vulns-challenges/${{ matrix.challenge }}:latest
+
+      - name: Get JWT
+        id: get-jwt
+        continue-on-error: true
+        run: docker run --rm ghcr.io/cerberauth/api-vulns-challenges/${{ matrix.challenge }}:latest jwt
+
+      - name: VulnAPI
+        uses: cerberauth/vulnapi-action@v1
+        id: vulnapi
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          curl: 'curl http://localhost:8080 -H "Authorization: Bearer ${{ steps.get-jwt.outputs.stdout }}"'
+
+      - name: Check for vulnerabilities
+        if: ${{ steps.vulnapi.outputs.conclusion == 'failure' }}
+        run: echo "Vulnerabilities found in ${{ matrix.challenge }}"
+
+      - name: Stop Server
+        if: ${{ always() }}
+        run: docker stop $(docker ps -q --filter ancestor=ghcr.io/cerberauth/api-vulns-challenges/${{ matrix.challenge }}:latest)
