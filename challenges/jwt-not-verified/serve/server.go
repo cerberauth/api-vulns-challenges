@@ -9,7 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func RunServer() {
+func RunServer(port string) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		authorizationHeader := r.Header.Get("authorization")
 		if authorizationHeader == "" {
@@ -34,5 +34,6 @@ func RunServer() {
 		}
 	})
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Server started at port", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

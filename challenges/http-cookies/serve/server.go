@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func RunServer() {
+func RunServer(port string) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		// set unsecure cookie
 		http.SetCookie(w, &http.Cookie{
@@ -16,5 +16,6 @@ func RunServer() {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Server started at port", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
