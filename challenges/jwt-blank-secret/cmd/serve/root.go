@@ -3,7 +3,7 @@ package serve
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-blank-password/serve"
+	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-blank-secret/serve"
 )
 
 func NewServeCmd() (serveCmd *cobra.Command) {
