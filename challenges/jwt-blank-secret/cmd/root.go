@@ -3,8 +3,8 @@ package cmd
 import (
 	"os"
 
-	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-blank-password/cmd/jwt"
-	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-blank-password/cmd/serve"
+	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-blank-secret/cmd/jwt"
+	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-blank-secret/cmd/serve"
 
 	"github.com/spf13/cobra"
 )
