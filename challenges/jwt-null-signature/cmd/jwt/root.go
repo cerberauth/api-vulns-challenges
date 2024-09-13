@@ -27,7 +27,10 @@ func GenerateRS512JWT(sub string) (string, error) {
 	}
 
 	tokenString, err := jwt.NewWithClaims(jwt.SigningMethodEdDSA, jwt.MapClaims{
-		"sub": sub,
+		"sub":  sub,
+		"name": "John Doe",
+		"iat":  1516239022,
+		"exp":  1516242622,
 	}).SignedString(key)
 	if err != nil {
 		return "", err
@@ -41,7 +44,7 @@ func NewJwtCmd() (jwtCmd *cobra.Command) {
 	jwtCmd = &cobra.Command{
 		Use: "jwt",
 		Run: func(cmd *cobra.Command, args []string) {
-			tokenString, err := GenerateRS512JWT("abc123")
+			tokenString, err := GenerateRS512JWT("2cb307ba-bb46-4194-854f-4774046d9c9b")
 			if err != nil {
 				log.Fatal(err)
 			}
