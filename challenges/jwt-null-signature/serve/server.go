@@ -25,7 +25,7 @@ func readPublicKey() (crypto.PublicKey, error) {
 	return jwt.ParseEdPublicKeyFromPEM(publicKeyBytes)
 }
 
-func RunServer() {
+func RunServer(port string) {
 	publicKey, err := readPublicKey()
 	if err != nil {
 		log.Fatal(err)
@@ -71,5 +71,6 @@ func RunServer() {
 		}
 	})
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Server started at port", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
