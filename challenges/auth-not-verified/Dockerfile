@@ -19,5 +19,5 @@ EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["auth-not-verified", "serve"]
-CMD ["auth-not-verified"]
+ENTRYPOINT ["auth-not-verified"]
+CMD ["serve"]
