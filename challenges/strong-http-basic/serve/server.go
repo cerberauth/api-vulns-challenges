@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/cerberauth/api-vulns-challenges/common"
 )
 
 func generateRandomBasicUsername() string {
@@ -34,7 +35,8 @@ func RunServer(port string) {
 	expectedUsernameHash := sha256.Sum256([]byte(username))
 	expectedPasswordHash := sha256.Sum256([]byte(password))
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		username, password, ok := r.BasicAuth()
 		if ok {
 			usernameHash := sha256.Sum256([]byte(username))
@@ -54,5 +56,5 @@ func RunServer(port string) {
 	})
 
 	log.Println("Server started at port", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, common.SecurityHeadersMiddleware(mux)))
 }

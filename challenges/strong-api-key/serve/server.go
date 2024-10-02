@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/cerberauth/api-vulns-challenges/common"
 )
 
 func generateStrongAPIKey() (string, error) {
@@ -25,7 +27,8 @@ func RunServer(port string) {
 
 	fmt.Println("API Key:", apiKey)
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-API-Key") != apiKey {
 			w.WriteHeader(401)
 			return
@@ -35,5 +38,5 @@ func RunServer(port string) {
 	})
 
 	log.Println("Server started at port", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, common.SecurityHeadersMiddleware(mux)))
 }

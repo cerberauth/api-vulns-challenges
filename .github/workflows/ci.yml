@@ -8,83 +8,110 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
+env:
+  GO_VERSION: "1.26"
+
 jobs:
-  detect-changes:
+  vulnapi-generic-scans:
     runs-on: ubuntu-latest
-
-    outputs:
-      matrix: ${{ steps.detect.outputs.matrix }}
-
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Detect changed challenges
-        id: detect
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
-          else
-            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          fi
-
-          COMMON_CHANGED=$(echo "$CHANGED" | grep "^common/" | wc -l)
-
-          MATRIX=()
-          for challenge in $(ls challenges/); do
-            if [ "${BUILD_ALL:-false}" = "true" ]; then
-              MATRIX+=("$challenge")
-              continue
-            fi
-
-            CHALLENGE_CHANGED=$(echo "$CHANGED" | grep "^challenges/$challenge/" | wc -l)
-
-            if [ "$CHALLENGE_CHANGED" -gt 0 ]; then
-              MATRIX+=("$challenge")
-            elif [ "$COMMON_CHANGED" -gt 0 ] && grep -q "COPY common/" "challenges/$challenge/Dockerfile"; then
-              MATRIX+=("$challenge")
-            fi
-          done
-
-          if [ ${#MATRIX[@]} -eq 0 ]; then
-            echo "matrix=[]" >> $GITHUB_OUTPUT
-          else
-            echo "matrix=$(printf '%s\n' "${MATRIX[@]}" | jq -R . | jq -c -s .)" >> $GITHUB_OUTPUT
-          fi
-
-  docker-build-push:
-    needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.matrix != '[]' }}
-    runs-on: ubuntu-latest
-
-    permissions:
-      packages: write
 
     strategy:
       fail-fast: false
       matrix:
-        challenge: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+        scan:
+          - challenge: "auth-not-verified"
+            scan: "discover.accept_unauthenticated"
 
     steps:
       - uses: actions/checkout@v6
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
+      - name: Setup Go environment
+        uses: actions/setup-go@v5
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          go-version: ${{ env.GO_VERSION }}
 
-      - name: Build and push
-        uses: docker/build-push-action@v7
+      - name: Run the challenge
+        working-directory: ./challenges/${{ matrix.scan.challenge }}
+        run: |
+          go install
+          nohup go run main.go serve --port 8080 > >(tee stdout.log) 2> >(tee stderr.log >&2) &
+          sleep 5
+          curl http://127.0.0.1:8080
+
+      - name: VulnAPI
+        uses: cerberauth/vulnapi-action@v2
+        id: vulnapi
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          context: .
-          file: ./challenges/${{ matrix.challenge }}/Dockerfile
-          push: ${{ github.ref == 'refs/heads/main' }}
-          tags: ghcr.io/cerberauth/api-vulns-challenges/${{ matrix.challenge }}:latest
-          cache-from: type=registry,ref=ghcr.io/cerberauth/api-vulns-challenges/${{ matrix.challenge }}:latest
-          cache-to: type=inline
+          severityThreshold: 0
+          scans: ${{ matrix.scan.scan }}
+          curl: |
+            curl http://127.0.0.1:8080
+
+      - name: Check for vulnerabilities
+        if: ${{ steps.vulnapi.outcome != 'failure' }}
+        run: |
+          echo "No vulnerabilities found in ${{ matrix.scan.challenge }}"
+          exit 1
+
+  vulnapi-jwt-scans:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        scan:
+          - challenge: "jwt-alg-none-bypass"
+            scan: "jwt.alg_none"
+          - challenge: "jwt-blank-secret"
+            scan: "jwt.blank_secret"
+          # TODO fix it
+          # - challenge: "jwt-not-verified"
+          #   scan: "jwt.not_verified"
+          - challenge: "jwt-null-signature"
+            scan: "jwt.null_signature"
+          - challenge: "jwt-weak-hmac-secret"
+            scan: "jwt.weak_secret"
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Get JWT
+        working-directory: ./challenges/${{ matrix.scan.challenge }}
+        id: get-jwt
+        run: echo "jwt=$(go run main.go jwt)" >> $GITHUB_OUTPUT
+
+      - name: Run the challenge
+        working-directory: ./challenges/${{ matrix.scan.challenge }}
+        run: |
+          go install
+          nohup go run main.go serve --port 8080 > >(tee stdout.log) 2> >(tee stderr.log >&2) &
+          sleep 5
+          curl --verbose http://localhost:8080 -H "Authorization: Bearer ${{ steps.get-jwt.outputs.jwt }}"
+
+      - name: VulnAPI
+        uses: cerberauth/vulnapi-action@v2
+        id: vulnapi
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          scans: ${{ matrix.scan.scan }}
+          curl: |
+            curl http://localhost:8080 -H "Authorization: Bearer ${{ steps.get-jwt.outputs.jwt }}"
+
+      - name: Check for vulnerabilities
+        if: ${{ steps.vulnapi.outcome != 'failure' }}
+        run: |
+          echo "No vulnerabilities found in ${{ matrix.scan.challenge }}"
+          exit 1

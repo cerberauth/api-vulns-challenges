@@ -1,39 +1,20 @@
 package serve
 
 import (
-	"crypto"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"path"
 	"strings"
 
 	"github.com/cerberauth/api-vulns-challenges/common"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func readPublicKey() (crypto.PublicKey, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-
-	publicKeyBytes, err := os.ReadFile(path.Join(cwd, "keys", "public_key.pem"))
-	if err != nil {
-		return nil, err
-	}
-
-	return jwt.ParseEdPublicKeyFromPEM(publicKeyBytes)
-}
+var secret = []byte("strong-hmac-secret")
 
 func RunServer(port string) {
-	publicKey, err := readPublicKey()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tokenString, ok := common.ExtractBearerToken(r)
 		if !ok {
 			w.WriteHeader(401)
@@ -41,19 +22,24 @@ func RunServer(port string) {
 		}
 
 		parts := strings.Split(tokenString, ".")
+		if len(parts) < 3 {
+			w.WriteHeader(401)
+			return
+		}
+
 		if len(parts[2]) == 0 {
 			w.WriteHeader(204)
 			return
 		}
 
-		sig, err := jwt.NewParser().DecodeSegment(parts[2])
-		if err != nil {
-			w.WriteHeader(401)
-			return
-		}
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			return secret, nil
+		})
 
-		err = jwt.GetSigningMethod(jwt.SigningMethodEdDSA.Alg()).Verify(strings.Join(parts[0:2], "."), sig, publicKey)
-		if err == nil {
+		if token != nil && token.Valid {
 			w.WriteHeader(204)
 		} else {
 			fmt.Println(err)
@@ -62,5 +48,5 @@ func RunServer(port string) {
 	})
 
 	log.Println("Server started at port", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, common.SecurityHeadersMiddleware(mux)))
 }

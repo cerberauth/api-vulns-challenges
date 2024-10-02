@@ -1,6 +1,6 @@
 module github.com/cerberauth/api-vulns-challenges/challenges/strong-http-basic
 
-go 1.22
+go 1.26
 
 require github.com/brianvoe/gofakeit/v7 v7.14.0
 
