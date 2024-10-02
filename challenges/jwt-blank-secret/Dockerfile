@@ -19,5 +19,5 @@ EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["jwt-blank-secret", "serve"]
-CMD ["jwt-blank-secret"]
+ENTRYPOINT ["jwt-blank-secret"]
+CMD ["serve"]
