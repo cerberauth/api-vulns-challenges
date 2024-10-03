@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -17,7 +18,7 @@ func readPublicKey() (crypto.PublicKey, error) {
 		return nil, err
 	}
 
-	publicKeyBytes, err := os.ReadFile(cwd + string(os.PathSeparator) + "keys/public_key.pem")
+	publicKeyBytes, err := os.ReadFile(path.Join(cwd, "keys", "public_key.pem"))
 	if err != nil {
 		return nil, err
 	}

@@ -13,6 +13,7 @@ FROM gcr.io/distroless/static-debian11:nonroot AS runner
 
 WORKDIR /
 
+COPY --from=builder --chown=nonroot:nonroot /app/keys /keys
 COPY --from=builder --chown=nonroot:nonroot /jwt-weak-rsa-key /usr/bin/jwt-weak-rsa-key
 
 EXPOSE 8080
