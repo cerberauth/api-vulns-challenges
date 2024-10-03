@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/cobra"
@@ -15,7 +16,7 @@ func GenerateRS512JWT(sub string) (string, error) {
 		return "", err
 	}
 
-	privateKeyBytes, err := os.ReadFile(cwd + string(os.PathSeparator) + "keys/private_key.pem")
+	privateKeyBytes, err := os.ReadFile(path.Join(cwd, "keys", "private_key.pem"))
 	if err != nil {
 		return "", err
 	}
