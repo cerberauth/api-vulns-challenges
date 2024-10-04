@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/cobra"
@@ -30,8 +31,8 @@ func GenerateRS512JWT(sub string) (string, error) {
 	tokenString, err := jwt.NewWithClaims(jwt.SigningMethodEdDSA, jwt.MapClaims{
 		"sub":  sub,
 		"name": "John Doe",
-		"iat":  1516239022,
-		"exp":  1516242622,
+		"iat":  time.Now().Unix(),
+		"exp":  time.Now().Add(time.Hour).Unix(),
 	}).SignedString(key)
 	if err != nil {
 		return "", err
