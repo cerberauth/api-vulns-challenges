@@ -1,4 +1,4 @@
-module github.com/cerberauth/api-vulns-challenges/challenges/http-cookies
+module github.com/cerberauth/api-vulns-challenges/challenges/http-misconfigurations
 
 go 1.20
 

@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/cerberauth/api-vulns-challenges/challenges/http-cookies/cmd/serve"
+	"github.com/cerberauth/api-vulns-challenges/challenges/http-misconfigurations/cmd/serve"
 
 	"github.com/spf13/cobra"
 )
