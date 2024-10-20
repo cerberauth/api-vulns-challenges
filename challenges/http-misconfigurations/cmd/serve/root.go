@@ -3,7 +3,7 @@ package serve
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/cerberauth/api-vulns-challenges/challenges/http-cookies/serve"
+	"github.com/cerberauth/api-vulns-challenges/challenges/http-misconfigurations/serve"
 )
 
 var (
