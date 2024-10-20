@@ -12,6 +12,24 @@ func RunServer(port string) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
+	http.HandleFunc("/http-method-overide", func(w http.ResponseWriter, r *http.Request) {
+		method := r.Header.Get("X-HTTP-Method-Override")
+		if method == "" {
+			method = r.Method
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if method == "POST" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"message": "POST method"}`))
+		} else if method == "GET" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"message": "GET method"}`))
+		} else {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
 	http.HandleFunc("/headers/cors-wildcard", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -64,7 +82,6 @@ func RunServer(port string) {
 	})
 
 	http.HandleFunc("/cookies/no-expiration", func(w http.ResponseWriter, r *http.Request) {
-		// set unsecure cookie
 		http.SetCookie(w, &http.Cookie{
 			Name:     "unsecure",
 			Value:    "unsecure",
