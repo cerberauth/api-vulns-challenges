@@ -12,6 +12,22 @@ func RunServer(port string) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
+	http.HandleFunc("/http-method-override", func(w http.ResponseWriter, r *http.Request) {
+		validToken := "valid-token"
+		if r.Header.Get("Authorization") != "Bearer "+validToken {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method == http.MethodGet || r.Header.Get("X-HTTP-Method-Override") == http.MethodGet || r.URL.Query().Get("_method") == http.MethodGet {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"message": "GET method"}`))
+		} else {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
 	http.HandleFunc("/headers/cors-wildcard", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -64,7 +80,6 @@ func RunServer(port string) {
 	})
 
 	http.HandleFunc("/cookies/no-expiration", func(w http.ResponseWriter, r *http.Request) {
-		// set unsecure cookie
 		http.SetCookie(w, &http.Cookie{
 			Name:     "unsecure",
 			Value:    "unsecure",
