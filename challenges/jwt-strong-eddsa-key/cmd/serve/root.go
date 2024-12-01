@@ -3,7 +3,7 @@ package serve
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-null-signature/serve"
+	"github.com/cerberauth/api-vulns-challenges/challenges/jwt-strong-eddsa-key/serve"
 )
 
 var (
