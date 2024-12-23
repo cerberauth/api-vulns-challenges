@@ -8,48 +8,106 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
+env:
+  GO_VERSION: 1.23
+
 jobs:
-  list-challenges:
+  vulnapi-generic-scans:
     runs-on: ubuntu-latest
-
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - id: set-matrix
-        run: echo "matrix=$(ls challenges/ | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
-
-  docker-build-push:
-    needs: list-challenges
-    runs-on: ubuntu-latest
-
-    permissions:
-      packages: write
 
     strategy:
+      fail-fast: false
       matrix:
-        challenge: ${{ fromJson(needs.list-challenges.outputs.matrix) }}
+        scan:
+          - challenge: "auth-not-verified"
+            scan: "generic.accept_unauthenticated_operation"
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: Setup Go environment
+        uses: actions/setup-go@v5
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          go-version: ${{ env.GO_VERSION }}
 
-      - name: Build and push
-        uses: docker/build-push-action@v6
+      - name: Run the challenge
+        working-directory: ./challenges/${{ matrix.scan.challenge }}
+        run: |
+          go install
+          nohup go run main.go serve --port 8080 > >(tee stdout.log) 2> >(tee stderr.log >&2) &
+          sleep 5
+          curl http://127.0.0.1:8080
+
+      - name: VulnAPI
+        uses: cerberauth/vulnapi-action@v1
+        id: vulnapi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          context: ./challenges/${{ matrix.challenge }}
-          push: ${{ github.ref == 'refs/heads/main' }}
-          tags: ghcr.io/cerberauth/api-vulns-challenges/${{ matrix.challenge }}:latest
-          cache-from: type=registry,ref=ghcr.io/cerberauth/api-vulns-challenges/${{ matrix.challenge }}:latest
-          cache-to: type=inline
+          curl: |
+            curl http://127.0.0.1:8080
+
+      - name: Check for vulnerabilities
+        if: ${{ success() }}
+        run: |
+          echo "No vulnerabilities found in ${{ matrix.scan.challenge }}"
+          exit 1
+
+  vulnapi-jwt-scans:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        scan:
+          - challenge: "jwt-alg-none-bypass"
+            scan: "jwt.alg_none"
+          - challenge: "jwt-blank-secret"
+            scan: "jwt.blank_secret"
+          - challenge: "jwt-not-verified"
+            scan: "jwt.not_verified"
+          - challenge: "jwt-null-signature"
+            scan: "jwt.null_signature"
+          - challenge: "jwt-weak-hmac-secret"
+            scan: "jwt.weak_secret"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Get JWT
+        working-directory: ./challenges/${{ matrix.scan.challenge }}
+        id: get-jwt
+        run: echo "jwt=$(go run main.go jwt)" >> $GITHUB_OUTPUT
+
+      - name: Run the challenge
+        working-directory: ./challenges/${{ matrix.scan.challenge }}
+        run: |
+          go install
+          nohup go run main.go serve --port 8080 > >(tee stdout.log) 2> >(tee stderr.log >&2) &
+          sleep 5
+          curl --verbose http://localhost:8080 -H "Authorization: Bearer ${{ steps.get-jwt.outputs.jwt }}"
+
+      - name: VulnAPI
+        uses: cerberauth/vulnapi-action@v1
+        id: vulnapi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+        with:
+          scans: ${{ matrix.scan.scan }}
+          curl: |
+            curl http://localhost:8080 -H "Authorization: Bearer ${{ steps.get-jwt.outputs.jwt }}"
+
+      - name: Check for vulnerabilities
+        if: ${{ success() }}
+        run: |
+          echo "No vulnerabilities found in ${{ matrix.scan.challenge }}"
+          exit 1
