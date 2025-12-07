@@ -1,5 +1,21 @@
 {
-    "extends": [
-        "github>cerberauth/renovate-config"
-    ]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>cerberauth/renovate-config"
+  ],
+  "minor": {
+    "enabled": false
+  },
+  "patch": {
+    "enabled": false
+  },
+  "packageRules": [
+    {
+      "description": "Ignore all packages in the devDependencies section",
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "enabled": false
+    }
+  ]
 }
