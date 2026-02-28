@@ -2,12 +2,10 @@ FROM golang:1.26 AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN go mod download
+COPY common/ ./common/
+COPY challenges/http-misconfigurations/ ./challenges/http-misconfigurations/
 
-COPY . ./
-
-RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -o /http-misconfigurations .
+RUN cd challenges/http-misconfigurations && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /http-misconfigurations .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 

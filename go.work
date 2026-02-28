@@ -1,0 +1,17 @@
+go 1.22
+
+use (
+	./challenges/auth-not-verified
+	./challenges/discoverable
+	./challenges/http-misconfigurations
+	./challenges/jwt-alg-none-bypass
+	./challenges/jwt-blank-secret
+	./challenges/jwt-not-verified
+	./challenges/jwt-null-signature
+	./challenges/jwt-strong-eddsa-key
+	./challenges/jwt-weak-hmac-secret
+	./challenges/jwt-weak-rsa-key
+	./challenges/strong-api-key
+	./challenges/strong-http-basic
+	./common
+)

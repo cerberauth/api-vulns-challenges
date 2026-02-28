@@ -1,11 +1,11 @@
-FROM node:24 as builder
+FROM node:24 AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY challenges/apollo/package*.json ./
 RUN npm ci
 
-COPY . .
+COPY challenges/apollo/ .
 
 RUN npm run build
 
@@ -13,7 +13,7 @@ FROM node:24-slim
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY challenges/apollo/package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist

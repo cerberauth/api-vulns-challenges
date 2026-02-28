@@ -2,12 +2,10 @@ FROM golang:1.26 AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN go mod download
+COPY common/ ./common/
+COPY challenges/discoverable/ ./challenges/discoverable/
 
-COPY . ./
-
-RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -o /discoverable .
+RUN cd challenges/discoverable && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /discoverable .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 
