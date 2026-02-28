@@ -2,18 +2,16 @@ FROM golang:1.26 AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN go mod download
+COPY common/ ./common/
+COPY challenges/jwt-null-signature/ ./challenges/jwt-null-signature/
 
-COPY . ./
-
-RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -o /jwt-null-signature .
+RUN cd challenges/jwt-null-signature && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-null-signature .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 
 WORKDIR /
 
-COPY --from=builder --chown=nonroot:nonroot /app/keys /keys
+COPY --from=builder --chown=nonroot:nonroot /app/challenges/jwt-null-signature/keys /keys
 COPY --from=builder --chown=nonroot:nonroot /jwt-null-signature /usr/bin/jwt-null-signature
 
 EXPOSE 8080

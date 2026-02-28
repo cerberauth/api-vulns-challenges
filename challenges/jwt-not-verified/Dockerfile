@@ -2,18 +2,16 @@ FROM golang:1.26 AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN go mod download
+COPY common/ ./common/
+COPY challenges/jwt-not-verified/ ./challenges/jwt-not-verified/
 
-COPY . ./
-
-RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -o /jwt-not-verified .
+RUN cd challenges/jwt-not-verified && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-not-verified .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 
 WORKDIR /
 
-COPY --from=builder --chown=nonroot:nonroot /app/keys /keys
+COPY --from=builder --chown=nonroot:nonroot /app/challenges/jwt-not-verified/keys /keys
 COPY --from=builder --chown=nonroot:nonroot /jwt-not-verified /usr/bin/jwt-not-verified
 
 EXPOSE 8080

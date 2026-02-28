@@ -1,7 +1,10 @@
 package main
 
-import "github.com/cerberauth/api-vulns-challenges/challenges/strong-api-key/cmd"
+import (
+	"github.com/cerberauth/api-vulns-challenges/challenges/strong-api-key/serve"
+	"github.com/cerberauth/api-vulns-challenges/common"
+)
 
 func main() {
-	cmd.Execute()
+	common.Execute(serve.RunServer)
 }

@@ -9,6 +9,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/cerberauth/api-vulns-challenges/common"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -33,20 +34,8 @@ func RunServer(port string) {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		authorizationHeader := r.Header.Get("authorization")
-		if authorizationHeader == "" {
-			w.WriteHeader(401)
-			return
-		}
-
-		headerParts := strings.Split(authorizationHeader, "Bearer")
-		if len(headerParts) != 2 {
-			w.WriteHeader(401)
-			return
-		}
-
-		tokenString := strings.TrimSpace(headerParts[1])
-		if len(tokenString) == 0 {
+		tokenString, ok := common.ExtractBearerToken(r)
+		if !ok {
 			w.WriteHeader(401)
 			return
 		}
