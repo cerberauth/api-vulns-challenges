@@ -3,7 +3,7 @@ module github.com/cerberauth/api-vulns-challenges/challenges/strong-http-basic
 go 1.22
 
 require (
-	github.com/brianvoe/gofakeit/v7 v7.12.1
+	github.com/brianvoe/gofakeit/v7 v7.14.0
 	github.com/spf13/cobra v1.10.2
 )
 
