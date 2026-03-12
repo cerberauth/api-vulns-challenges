@@ -9,20 +9,53 @@ on:
       - main
 
 jobs:
-  list-challenges:
+  detect-changes:
     runs-on: ubuntu-latest
 
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      matrix: ${{ steps.detect.outputs.matrix }}
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
-      - id: set-matrix
-        run: echo "matrix=$(ls challenges/ | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+      - name: Detect changed challenges
+        id: detect
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          else
+            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+
+          COMMON_CHANGED=$(echo "$CHANGED" | grep "^common/" | wc -l)
+
+          MATRIX=()
+          for challenge in $(ls challenges/); do
+            if [ "${BUILD_ALL:-false}" = "true" ]; then
+              MATRIX+=("$challenge")
+              continue
+            fi
+
+            CHALLENGE_CHANGED=$(echo "$CHANGED" | grep "^challenges/$challenge/" | wc -l)
+
+            if [ "$CHALLENGE_CHANGED" -gt 0 ]; then
+              MATRIX+=("$challenge")
+            elif [ "$COMMON_CHANGED" -gt 0 ] && grep -q "COPY common/" "challenges/$challenge/Dockerfile"; then
+              MATRIX+=("$challenge")
+            fi
+          done
+
+          if [ ${#MATRIX[@]} -eq 0 ]; then
+            echo "matrix=[]" >> $GITHUB_OUTPUT
+          else
+            echo "matrix=$(printf '%s\n' "${MATRIX[@]}" | jq -R . | jq -c -s .)" >> $GITHUB_OUTPUT
+          fi
 
   docker-build-push:
-    needs: list-challenges
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.matrix != '[]' }}
     runs-on: ubuntu-latest
 
     permissions:
@@ -31,7 +64,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        challenge: ${{ fromJson(needs.list-challenges.outputs.matrix) }}
+        challenge: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
 
     steps:
       - uses: actions/checkout@v6
