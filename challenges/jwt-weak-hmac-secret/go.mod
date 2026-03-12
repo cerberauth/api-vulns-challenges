@@ -1,6 +1,6 @@
 module github.com/cerberauth/api-vulns-challenges/challenges/jwt-weak-hmac-secret
 
-go 1.21
+go 1.26
 
 require github.com/golang-jwt/jwt/v5 v5.3.1
 

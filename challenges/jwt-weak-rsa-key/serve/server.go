@@ -33,7 +33,8 @@ func RunServer(port string) {
 		log.Fatal(err)
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tokenString, ok := common.ExtractBearerToken(r)
 		if !ok {
 			w.WriteHeader(401)
@@ -57,5 +58,5 @@ func RunServer(port string) {
 	})
 
 	log.Println("Server started at port", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, common.SecurityHeadersMiddleware(mux)))
 }
