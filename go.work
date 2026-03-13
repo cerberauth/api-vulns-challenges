@@ -6,6 +6,9 @@ use (
 	./challenges/http-misconfigurations
 	./challenges/jwt-alg-none-bypass
 	./challenges/jwt-blank-secret
+	./challenges/jwt-hmac-confusion
+	./challenges/jwt-kid-path-traversal
+	./challenges/jwt-kid-sql-injection
 	./challenges/jwt-not-verified
 	./challenges/jwt-null-signature
 	./challenges/jwt-strong-eddsa-key
