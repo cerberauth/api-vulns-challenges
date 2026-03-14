@@ -28,6 +28,10 @@ func RunServer(port string) {
 	}
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("/public-key", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/x-pem-file")
+		w.Write(publicKeyBytes)
+	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tokenString, ok := common.ExtractBearerToken(r)
 		if !ok {
