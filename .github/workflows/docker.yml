@@ -53,8 +53,26 @@ jobs:
             echo "matrix=$(printf '%s\n' "${MATRIX[@]}" | jq -R . | jq -c -s .)" >> $GITHUB_OUTPUT
           fi
 
-  docker-build-push:
+  docker-lint:
     needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.matrix != '[]' }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        challenge: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Lint Dockerfile
+        uses: cerberauth/ci/actions/docker-lint@main
+        with:
+          dockerfile: ./challenges/${{ matrix.challenge }}/Dockerfile
+
+  docker-build-push:
+    needs: [detect-changes, docker-lint]
     if: ${{ needs.detect-changes.outputs.matrix != '[]' }}
     runs-on: ubuntu-latest
 
