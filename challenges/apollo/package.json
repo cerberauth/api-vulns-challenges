@@ -12,7 +12,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@apollo/server": "^4.11.0",
+    "@apollo/server": "^5.0.0",
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "graphql": "^16.9.0",
