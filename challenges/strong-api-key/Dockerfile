@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/strong-api-key/ ./challenges/strong-api-key/
 
-RUN cd challenges/strong-api-key && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /strong-api-key .
+WORKDIR /app/challenges/strong-api-key
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /strong-api-key .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 

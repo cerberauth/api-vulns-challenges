@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/jwt-kid-path-traversal/ ./challenges/jwt-kid-path-traversal/
 
-RUN cd challenges/jwt-kid-path-traversal && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-kid-path-traversal .
+WORKDIR /app/challenges/jwt-kid-path-traversal
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-kid-path-traversal .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 

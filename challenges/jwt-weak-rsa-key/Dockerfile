@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/jwt-weak-rsa-key/ ./challenges/jwt-weak-rsa-key/
 
-RUN cd challenges/jwt-weak-rsa-key && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-weak-rsa-key .
+WORKDIR /app/challenges/jwt-weak-rsa-key
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-weak-rsa-key .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 

@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/strong-http-basic/ ./challenges/strong-http-basic/
 
-RUN cd challenges/strong-http-basic && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /strong-http-basic .
+WORKDIR /app/challenges/strong-http-basic
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /strong-http-basic .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 

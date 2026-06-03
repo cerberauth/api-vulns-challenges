@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/http-misconfigurations/ ./challenges/http-misconfigurations/
 
-RUN cd challenges/http-misconfigurations && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /http-misconfigurations .
+WORKDIR /app/challenges/http-misconfigurations
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /http-misconfigurations .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 

@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/jwt-null-signature/ ./challenges/jwt-null-signature/
 
-RUN cd challenges/jwt-null-signature && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-null-signature .
+WORKDIR /app/challenges/jwt-null-signature
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-null-signature .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 

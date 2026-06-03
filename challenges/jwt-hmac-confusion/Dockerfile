@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/jwt-hmac-confusion/ ./challenges/jwt-hmac-confusion/
 
-RUN cd challenges/jwt-hmac-confusion && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-hmac-confusion .
+WORKDIR /app/challenges/jwt-hmac-confusion
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-hmac-confusion .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 

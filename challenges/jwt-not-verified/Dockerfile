@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/jwt-not-verified/ ./challenges/jwt-not-verified/
 
-RUN cd challenges/jwt-not-verified && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-not-verified .
+WORKDIR /app/challenges/jwt-not-verified
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-not-verified .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 

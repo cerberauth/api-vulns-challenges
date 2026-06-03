@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/jwt-strong-eddsa-key/ ./challenges/jwt-strong-eddsa-key/
 
-RUN cd challenges/jwt-strong-eddsa-key && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-strong-eddsa-key .
+WORKDIR /app/challenges/jwt-strong-eddsa-key
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-strong-eddsa-key .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 
