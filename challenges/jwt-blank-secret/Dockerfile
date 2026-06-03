@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/jwt-blank-secret/ ./challenges/jwt-blank-secret/
 
-RUN cd challenges/jwt-blank-secret && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-blank-secret .
+WORKDIR /app/challenges/jwt-blank-secret
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-blank-secret .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 

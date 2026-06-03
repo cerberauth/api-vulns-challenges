@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/discoverable/ ./challenges/discoverable/
 
-RUN cd challenges/discoverable && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /discoverable .
+WORKDIR /app/challenges/discoverable
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /discoverable .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 

@@ -5,7 +5,8 @@ WORKDIR /app
 COPY common/ ./common/
 COPY challenges/jwt-weak-hmac-secret/ ./challenges/jwt-weak-hmac-secret/
 
-RUN cd challenges/jwt-weak-hmac-secret && CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-weak-hmac-secret .
+WORKDIR /app/challenges/jwt-weak-hmac-secret
+RUN CGO_ENABLED=0 GOWORK=off GOOS=linux go build -o /jwt-weak-hmac-secret .
 
 FROM gcr.io/distroless/static-debian11:nonroot AS runner
 
