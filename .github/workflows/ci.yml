@@ -75,6 +75,8 @@ jobs:
           #   scan: "jwt.not_verified"
           - challenge: "jwt-null-signature"
             scan: "jwt.null_signature"
+          # - challenge: "jwt-psychic-signature"
+          #   scan: "jwt.psychic_signature"
           - challenge: "jwt-weak-hmac-secret"
             scan: "jwt.weak_secret"
 

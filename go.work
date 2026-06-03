@@ -11,6 +11,7 @@ use (
 	./challenges/jwt-kid-sql-injection
 	./challenges/jwt-not-verified
 	./challenges/jwt-null-signature
+	./challenges/jwt-psychic-signature
 	./challenges/jwt-strong-eddsa-key
 	./challenges/jwt-weak-hmac-secret
 	./challenges/jwt-weak-rsa-key
