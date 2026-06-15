@@ -31,6 +31,28 @@ git clone https://github.com/cerberauth/api-vulns-challenges.git
 
 5. Share Your Results: If you wish, you can share your findings, write-ups, or solutions by submitting a pull request to this repository.
 
+## Challenges
+
+The following challenges are available in this repository:
+
+- [Apollo GraphQL Server](challenges/apollo)
+- [Auth Not Verified](challenges/auth-not-verified)
+- [Discoverable](challenges/discoverable)
+- [HTTP Misconfigurations](challenges/http-misconfigurations)
+- [JWT None Algorithm Bypass](challenges/jwt-alg-none-bypass)
+- [JWT Blank Secret](challenges/jwt-blank-secret)
+- [JWT HMAC/RSA Confusion](challenges/jwt-hmac-confusion)
+- [JWT KID Path Traversal](challenges/jwt-kid-path-traversal)
+- [JWT KID SQL Injection](challenges/jwt-kid-sql-injection)
+- [JWT Not Verified](challenges/jwt-not-verified)
+- [JWT Null Signature](challenges/jwt-null-signature)
+- [JWT Psychic Signature](challenges/jwt-psychic-signature)
+- [JWT Strong EdDSA Key](challenges/jwt-strong-eddsa-key)
+- [JWT Weak HMAC Secret](challenges/jwt-weak-hmac-secret)
+- [JWT Weak RSA Key](challenges/jwt-weak-rsa-key)
+- [Strong API Key](challenges/strong-api-key)
+- [Strong HTTP Basic](challenges/strong-http-basic)
+
 ## Contributing
 
 We encourage contributions from the community to expand the repository with new challenges, improve existing challenges, or provide better documentation. If you would like to contribute, please read our Contribution Guidelines for details on how to get started.
@@ -42,3 +64,7 @@ The challenges provided in this repository are designed to be educational and fo
 ## License
 
 This repository is licensed under the GPL-3.0 license License. You are free to use, modify, and distribute the contents of this repository for educational and testing purposes.
+
+---
+
+Learn more about API security at [Cerberauth](https://www.cerberauth.com/)
