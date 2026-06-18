@@ -16,7 +16,7 @@ jobs:
       matrix: ${{ steps.detect.outputs.matrix }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -64,7 +64,7 @@ jobs:
         challenge: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Lint Dockerfile
         uses: cerberauth/ci/actions/docker-lint@main
@@ -85,7 +85,7 @@ jobs:
         challenge: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
