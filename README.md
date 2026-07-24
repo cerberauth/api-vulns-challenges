@@ -43,6 +43,7 @@ The following challenges are available in this repository:
 - [JWT Blank Secret](challenges/jwt-blank-secret)
 - [JWT HMAC/RSA Confusion](challenges/jwt-hmac-confusion)
 - [JWT Issuer Confusion](challenges/jwt-issuer-confusion)
+- [JWT JWK Header Injection](challenges/jwt-jwk-header-injection)
 - [JWT KID Path Traversal](challenges/jwt-kid-path-traversal)
 - [JWT KID SQL Injection](challenges/jwt-kid-sql-injection)
 - [JWT Not Verified](challenges/jwt-not-verified)
