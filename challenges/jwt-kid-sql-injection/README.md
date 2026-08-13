@@ -5,7 +5,17 @@ This challenge demonstrates a JWT implementation that is vulnerable to SQL injec
 ## How to run it
 
 ```bash
-go run main.go
+go run main.go serve
+```
+
+## How to exploit it
+
+```bash
+# Get a sample token
+TOKEN=$(go run main.go jwt)
+
+# Scan with jwtop — challenge uses table "keys", not the default "tokens"
+jwtop crack "$TOKEN" --url http://localhost:8080 --kid-sql-table keys
 ```
 
 ## Disclaimer

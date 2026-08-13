@@ -5,7 +5,11 @@ use (
 	./challenges/discoverable
 	./challenges/http-misconfigurations
 	./challenges/jwt-alg-none-bypass
+	./challenges/jwt-apple-token-relay
 	./challenges/jwt-blank-secret
+	./challenges/jwt-cross-service-relay
+	./challenges/jwt-facebook-token-relay
+	./challenges/jwt-google-token-relay
 	./challenges/jwt-hmac-confusion
 	./challenges/jwt-issuer-confusion
 	./challenges/jwt-jku-header-injection
@@ -13,6 +17,7 @@ use (
 	./challenges/jwt-jwks-issuer-injection
 	./challenges/jwt-kid-path-traversal
 	./challenges/jwt-kid-sql-injection
+	./challenges/jwt-microsoft-token-relay
 	./challenges/jwt-not-verified
 	./challenges/jwt-null-signature
 	./challenges/jwt-psychic-signature
