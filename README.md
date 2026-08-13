@@ -53,6 +53,7 @@ The following challenges are available in this repository:
 - [JWT Strong EdDSA Key](challenges/jwt-strong-eddsa-key)
 - [JWT Weak HMAC Secret](challenges/jwt-weak-hmac-secret)
 - [JWT Weak RSA Key](challenges/jwt-weak-rsa-key)
+- [JWT x5c/x5u Header Injection](challenges/jwt-x5c-x5u-header-injection)
 - [Strong API Key](challenges/strong-api-key)
 - [Strong HTTP Basic](challenges/strong-http-basic)
 
