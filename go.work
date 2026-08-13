@@ -8,6 +8,7 @@ use (
 	./challenges/jwt-blank-secret
 	./challenges/jwt-hmac-confusion
 	./challenges/jwt-issuer-confusion
+	./challenges/jwt-jku-header-injection
 	./challenges/jwt-jwk-header-injection
 	./challenges/jwt-kid-path-traversal
 	./challenges/jwt-kid-sql-injection
