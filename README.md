@@ -45,6 +45,7 @@ The following challenges are available in this repository:
 - [JWT Issuer Confusion](challenges/jwt-issuer-confusion)
 - [JWT JKU Header Injection](challenges/jwt-jku-header-injection)
 - [JWT JWK Header Injection](challenges/jwt-jwk-header-injection)
+- [JWT JWKS Issuer Injection](challenges/jwt-jwks-issuer-injection)
 - [JWT KID Path Traversal](challenges/jwt-kid-path-traversal)
 - [JWT KID SQL Injection](challenges/jwt-kid-sql-injection)
 - [JWT Not Verified](challenges/jwt-not-verified)
