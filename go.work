@@ -18,6 +18,7 @@ use (
 	./challenges/jwt-strong-eddsa-key
 	./challenges/jwt-weak-hmac-secret
 	./challenges/jwt-weak-rsa-key
+	./challenges/jwt-x5c-x5u-header-injection
 	./challenges/strong-api-key
 	./challenges/strong-http-basic
 	./common
