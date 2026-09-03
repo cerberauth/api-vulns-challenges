@@ -7,6 +7,9 @@ use (
 	./challenges/jwt-alg-none-bypass
 	./challenges/jwt-apple-token-relay
 	./challenges/jwt-blank-secret
+	./challenges/jwt-claim-oversized-value
+	./challenges/jwt-claim-special-chars
+	./challenges/jwt-claim-type-confusion
 	./challenges/jwt-cross-service-relay
 	./challenges/jwt-facebook-token-relay
 	./challenges/jwt-google-token-relay
