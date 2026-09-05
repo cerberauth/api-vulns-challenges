@@ -30,7 +30,7 @@ func initDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	db, err := initDB()
 	if err != nil {
 		log.Fatal(err)
@@ -55,10 +55,16 @@ func RunServer(port string) {
 				return nil, fmt.Errorf("missing kid header")
 			}
 
-			// VULNERABILITY: SQL injection via unsanitized kid header
-			query := "SELECT secret FROM keys WHERE kid = '" + kid + "'"
 			var secret string
-			err := db.QueryRow(query).Scan(&secret)
+			var err error
+			if vulnerable {
+				// VULNERABILITY: SQL injection via unsanitized kid header
+				query := "SELECT secret FROM keys WHERE kid = '" + kid + "'"
+				err = db.QueryRow(query).Scan(&secret)
+			} else {
+				// fixed: the kid is passed as a bound parameter
+				err = db.QueryRow("SELECT secret FROM keys WHERE kid = ?", kid).Scan(&secret)
+			}
 			if err != nil {
 				return nil, fmt.Errorf("key not found: %v", err)
 			}

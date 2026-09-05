@@ -46,6 +46,11 @@ const resolvers = {
   },
 };
 
+// Toggle between the vulnerable and the fixed, non-vulnerable configuration.
+// Defaults to the vulnerable mode, matching the other challenges in this
+// repository. Set VULNERABLE=false to run the fixed configuration.
+const vulnerable = process.env.VULNERABLE !== 'false';
+
 const app = express();
 const httpServer = http.createServer(app);
 
@@ -68,13 +73,20 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  // vulnerable: introspection lets anyone dump the full schema, including
+  // fields and types never meant to be discoverable by a client
+  introspection: vulnerable,
 });
 
 await server.start();
 
 app.use(
   '/graphql',
-  cors<cors.CorsRequest>(),
+  // vulnerable: any origin is allowed to make credentialed cross-site
+  // requests to the GraphQL endpoint
+  vulnerable
+    ? cors<cors.CorsRequest>()
+    : cors<cors.CorsRequest>({ origin: 'https://trusted.example.com' }),
   helmet(),
   express.json(),
   logger,

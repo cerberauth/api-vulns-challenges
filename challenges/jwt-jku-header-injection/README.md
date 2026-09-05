@@ -8,6 +8,18 @@ This challenge demonstrates a JWT implementation vulnerable to **JKU header inje
 go run main.go serve
 ```
 
+## Modes
+
+The server supports two modes, toggled with the `--vulnerable` flag on the `serve` command (defaults to `true`):
+
+```bash
+# vulnerable: the jku header is fetched and trusted as the verification key source
+go run main.go serve --vulnerable=true
+
+# fixed: the jku header is ignored, verification always uses the server's pinned key
+go run main.go serve --vulnerable=false
+```
+
 ## How to exploit it
 
 ```bash

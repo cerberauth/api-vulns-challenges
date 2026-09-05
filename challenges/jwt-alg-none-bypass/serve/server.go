@@ -9,7 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tokenString, ok := common.ExtractBearerToken(r)
@@ -20,7 +20,7 @@ func RunServer(port string) {
 
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			// fake vulnerability
-			if token.Method.Alg() == "none" {
+			if vulnerable && token.Method.Alg() == "none" {
 				return jwt.UnsafeAllowNoneSignatureType, nil
 			}
 

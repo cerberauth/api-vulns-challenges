@@ -16,7 +16,7 @@ const (
 	IssuerB = "https://issuer-b.example.com"
 )
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -28,6 +28,16 @@ func RunServer(port string) {
 	}
 
 	issuerAPublicKey, err := jwt.ParseRSAPublicKeyFromPEM(issuerAPublicKeyBytes)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	issuerBPublicKeyBytes, err := os.ReadFile(path.Join(cwd, "keys", "issuer-b_public_key.pem"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	issuerBPublicKey, err := jwt.ParseRSAPublicKeyFromPEM(issuerBPublicKeyBytes)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,13 +74,23 @@ func RunServer(port string) {
 				return issuerAPublicKey, nil
 			})
 		case IssuerB:
-			// VULNERABILITY: issuer-b is a legacy/trusted issuer whose tokens are
-			// parsed without any signature verification, so claims (including "iss")
-			// can be forged freely as long as the "iss" value matches this branch.
-			token, _, err = parser.ParseUnverified(tokenString, jwt.MapClaims{})
-			if err == nil {
-				token.Valid = true
+			if vulnerable {
+				// VULNERABILITY: issuer-b is a legacy/trusted issuer whose tokens are
+				// parsed without any signature verification, so claims (including "iss")
+				// can be forged freely as long as the "iss" value matches this branch.
+				token, _, err = parser.ParseUnverified(tokenString, jwt.MapClaims{})
+				if err == nil {
+					token.Valid = true
+				}
+				break
 			}
+
+			token, err = jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+				if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+				}
+				return issuerBPublicKey, nil
+			})
 		default:
 			err = fmt.Errorf("unknown issuer: %v", issuer)
 		}

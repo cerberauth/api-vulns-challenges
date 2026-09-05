@@ -8,6 +8,15 @@ This challenge demonstrates a token cross-service relay attack against a relying
 go run main.go serve
 ```
 
+## Modes
+
+The server supports two modes, toggled with the `--vulnerable` flag on the `serve` command (defaults to `true`):
+
+```bash
+go run main.go serve --vulnerable=true   # vulnerable: the audience (`aud`) claim is never checked
+go run main.go serve --vulnerable=false  # fixed: the token must also match the expected audience
+```
+
 ## How to exploit it
 
 ```bash

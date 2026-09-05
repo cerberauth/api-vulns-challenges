@@ -46,7 +46,7 @@ func readPublicKey() (*ecdsa.PublicKey, error) {
 	return key, nil
 }
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	publicKey, err := readPublicKey()
 	if err != nil {
 		log.Fatal(err)
@@ -92,7 +92,14 @@ func RunServer(port string) {
 
 		hash := sha256.Sum256([]byte(parts[0] + "." + parts[1]))
 
-		if !vulnerableECDSAVerify(publicKey, hash[:], r2, s2) {
+		verify := vulnerableECDSAVerify
+		if !vulnerable {
+			verify = func(pub *ecdsa.PublicKey, hash []byte, r, s *big.Int) bool {
+				return ecdsa.Verify(pub, hash, r, s)
+			}
+		}
+
+		if !verify(publicKey, hash[:], r2, s2) {
 			w.WriteHeader(401)
 			return
 		}

@@ -8,6 +8,18 @@ This challenge demonstrates a JWT implementation trusting two issuers, where onl
 go run main.go serve
 ```
 
+## Modes
+
+The server supports two modes, toggled with the `--vulnerable` flag on the `serve` command (defaults to `true`):
+
+```bash
+# vulnerable: tokens claiming issuer B are accepted without any signature check
+go run main.go serve --vulnerable=true
+
+# fixed: both issuers are properly signature-verified against their own key
+go run main.go serve --vulnerable=false
+```
+
 ## How to exploit it
 
 ```bash

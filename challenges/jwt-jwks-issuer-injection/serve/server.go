@@ -96,7 +96,7 @@ func runIdentityProvider(publicKey *rsa.PublicKey) {
 	log.Fatal(http.ListenAndServe(":"+idpPort, mux))
 }
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -132,6 +132,14 @@ func RunServer(port string) {
 
 		issuer, err := unverifiedClaims.GetIssuer()
 		if err != nil {
+			w.WriteHeader(401)
+			return
+		}
+
+		if !vulnerable && issuer != LegitIssuer {
+			// fixed: the issuer claim is checked against an allowlist of
+			// trusted issuers before being used to build the JWKS URL
+			fmt.Println("untrusted issuer:", issuer)
 			w.WriteHeader(401)
 			return
 		}

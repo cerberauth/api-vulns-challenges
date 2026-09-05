@@ -34,7 +34,22 @@ func debugRecoveryMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func RunServer(port string) {
+// recoveryMiddleware is the fixed counterpart of debugRecoveryMiddleware: it
+// still recovers from panics so the server keeps running, but never leaks
+// the panic message or stack trace to the client.
+func recoveryMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if rec := recover(); rec != nil {
+				log.Println("recovered from panic:", rec)
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
+}
+
+func RunServer(port string, vulnerable bool) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
 		tokenString, ok := common.ExtractBearerToken(r)
@@ -56,20 +71,40 @@ func RunServer(port string) {
 
 		claims := token.Claims.(jwt.MapClaims)
 
-		// Both claims are trusted blindly and type-asserted straight to
-		// the type the happy path expects, with no ok-check. A signature
-		// check only proves who signed the token, not that its claim
-		// values have the right shape - a claim of the wrong JSON type
-		// (number, bool, object) or JSON null (which decodes to a bare
-		// nil interface{} and fails the assertion exactly like a wrong
-		// type does) crashes the handler instead of being rejected.
-		name := claims["name"].(string)
-		roles := claims["roles"].([]interface{})
+		var name string
+		var roles []interface{}
+		if vulnerable {
+			// Both claims are trusted blindly and type-asserted straight to
+			// the type the happy path expects, with no ok-check. A signature
+			// check only proves who signed the token, not that its claim
+			// values have the right shape - a claim of the wrong JSON type
+			// (number, bool, object) or JSON null (which decodes to a bare
+			// nil interface{} and fails the assertion exactly like a wrong
+			// type does) crashes the handler instead of being rejected.
+			name = claims["name"].(string)
+			roles = claims["roles"].([]interface{})
+		} else {
+			// fixed: claim types are checked before use
+			name, ok = claims["name"].(string)
+			if !ok {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			roles, ok = claims["roles"].([]interface{})
+			if !ok {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{"name":%q,"roles":%d}`, name, len(roles))
 	})
 
 	log.Println("Server started at port", port)
-	log.Fatal(http.ListenAndServe(":"+port, common.SecurityHeadersMiddleware(debugRecoveryMiddleware(mux))))
+	recovery := debugRecoveryMiddleware
+	if !vulnerable {
+		recovery = recoveryMiddleware
+	}
+	log.Fatal(http.ListenAndServe(":"+port, common.SecurityHeadersMiddleware(recovery(mux))))
 }

@@ -16,7 +16,7 @@ const (
 	VictimAudience = "184921307134-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6.apps.googleusercontent.com"
 )
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -43,12 +43,17 @@ func RunServer(port string) {
 		// The relying party checks the Google signature and issuer only.
 		// It never validates the audience, so an ID token minted by Google
 		// for a different, attacker-controlled app is accepted here too.
+		parserOpts := []jwt.ParserOption{jwt.WithIssuer(Issuer)}
+		if !vulnerable {
+			parserOpts = append(parserOpts, jwt.WithAudience(VictimAudience))
+		}
+
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 			return idpPublicKey, nil
-		}, jwt.WithIssuer(Issuer))
+		}, parserOpts...)
 
 		if err != nil || !token.Valid {
 			fmt.Println(err)

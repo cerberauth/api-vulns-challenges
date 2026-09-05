@@ -16,7 +16,7 @@ const (
 	ServiceBAudience = "service-b-client-id"
 )
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -43,12 +43,17 @@ func RunServer(port string) {
 		// Service B only checks the signature and issuer of the shared IdP.
 		// It never validates the audience, so any token minted by the IdP
 		// for another service (e.g. Service A) is accepted here too.
+		parserOpts := []jwt.ParserOption{jwt.WithIssuer(Issuer)}
+		if !vulnerable {
+			parserOpts = append(parserOpts, jwt.WithAudience(ServiceBAudience))
+		}
+
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 			return idpPublicKey, nil
-		}, jwt.WithIssuer(Issuer))
+		}, parserOpts...)
 
 		if err != nil || !token.Valid {
 			fmt.Println(err)

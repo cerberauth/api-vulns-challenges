@@ -16,6 +16,18 @@ This is one of a family of related challenges, each isolating a different class 
 go run main.go serve
 ```
 
+## Modes
+
+The server supports two modes, toggled with the `--vulnerable` flag on the `serve` command (defaults to `true`):
+
+```bash
+# vulnerable: an invalid regexp filter claim panics the handler, and the panic (with stack trace) is leaked in the response
+go run main.go serve --vulnerable=true
+
+# fixed: invalid patterns are rejected instead of panicking, and panics never leak internals to the client
+go run main.go serve --vulnerable=false
+```
+
 ## How to exploit it
 
 ```bash

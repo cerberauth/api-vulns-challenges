@@ -12,7 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func generateToken() (string, error) {
+func generateToken(vulnerable bool) (string, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return "", err

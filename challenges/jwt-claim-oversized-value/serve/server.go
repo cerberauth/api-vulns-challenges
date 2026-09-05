@@ -44,7 +44,22 @@ func debugRecoveryMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func RunServer(port string) {
+// recoveryMiddleware is the fixed counterpart of debugRecoveryMiddleware: it
+// still recovers from panics so the server keeps running, but never leaks
+// the panic message or stack trace to the client.
+func recoveryMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if rec := recover(); rec != nil {
+				log.Println("recovered from panic:", rec)
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
+}
+
+func RunServer(port string, vulnerable bool) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/checkout", func(w http.ResponseWriter, r *http.Request) {
 		tokenString, ok := common.ExtractBearerToken(r)
@@ -65,20 +80,44 @@ func RunServer(port string) {
 		}
 
 		claims := token.Claims.(jwt.MapClaims)
-		coupon := claims["coupon"].(string)
 
-		// The coupon's raw length indexes straight into a fixed-size
-		// lookup table with no upper bound. Every coupon the developers
-		// ever tested with was a handful of characters, so this always
-		// worked - until a claim value far longer than expected (which
-		// is exactly what a length/size-boundary fuzz mutation sends)
-		// walks past the end of the slice.
-		discount := discountTiers[len(coupon)]
+		var coupon string
+		if vulnerable {
+			coupon = claims["coupon"].(string)
+		} else {
+			coupon, ok = claims["coupon"].(string)
+			if !ok {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+		}
+
+		var discount string
+		if vulnerable {
+			// The coupon's raw length indexes straight into a fixed-size
+			// lookup table with no upper bound. Every coupon the developers
+			// ever tested with was a handful of characters, so this always
+			// worked - until a claim value far longer than expected (which
+			// is exactly what a length/size-boundary fuzz mutation sends)
+			// walks past the end of the slice.
+			discount = discountTiers[len(coupon)]
+		} else {
+			// fixed: the index is clamped to the table's bounds
+			idx := len(coupon)
+			if idx >= len(discountTiers) {
+				idx = len(discountTiers) - 1
+			}
+			discount = discountTiers[idx]
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{"coupon":%q,"discount":%q}`, coupon, discount)
 	})
 
 	log.Println("Server started at port", port)
-	log.Fatal(http.ListenAndServe(":"+port, common.SecurityHeadersMiddleware(debugRecoveryMiddleware(mux))))
+	recovery := debugRecoveryMiddleware
+	if !vulnerable {
+		recovery = recoveryMiddleware
+	}
+	log.Fatal(http.ListenAndServe(":"+port, common.SecurityHeadersMiddleware(recovery(mux))))
 }

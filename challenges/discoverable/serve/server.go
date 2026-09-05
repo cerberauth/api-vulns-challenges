@@ -7,10 +7,15 @@ import (
 	"github.com/cerberauth/api-vulns-challenges/common"
 )
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	mux := http.NewServeMux()
-	fs := http.FileServer(http.Dir("./static"))
-	mux.Handle("/", fs)
+
+	if vulnerable {
+		// vulnerable: the OpenAPI spec (and any other file under ./static)
+		// is served publicly, letting anyone enumerate the full API surface
+		fs := http.FileServer(http.Dir("./static"))
+		mux.Handle("/", fs)
+	}
 
 	mux.HandleFunc("/health/ready", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

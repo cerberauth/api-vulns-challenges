@@ -8,6 +8,18 @@ This challenge demonstrates a JWT implementation vulnerable to **CVE-2018-0114**
 go run main.go serve
 ```
 
+## Modes
+
+The server supports two modes, toggled with the `--vulnerable` flag on the `serve` command (defaults to `true`):
+
+```bash
+# vulnerable: an embedded jwk header is trusted as the verification key
+go run main.go serve --vulnerable=true
+
+# fixed: the jwk header is ignored, verification always uses the server's pinned key
+go run main.go serve --vulnerable=false
+```
+
 ## How to exploit it
 
 ```bash

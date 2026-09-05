@@ -83,7 +83,7 @@ func publicKeyFromX5U(header map[string]interface{}) (*rsa.PublicKey, error) {
 	return parseCertDER(body)
 }
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -126,13 +126,17 @@ func RunServer(port string) {
 			// Trust whatever certificate material the caller supplies in
 			// the header instead of validating it against a pinned
 			// certificate or keystore.
-			if pub, err := publicKeyFromX5C(token.Header); err == nil {
-				return pub, nil
-			}
-			if pub, err := publicKeyFromX5U(token.Header); err == nil {
-				return pub, nil
+			if vulnerable {
+				if pub, err := publicKeyFromX5C(token.Header); err == nil {
+					return pub, nil
+				}
+				if pub, err := publicKeyFromX5U(token.Header); err == nil {
+					return pub, nil
+				}
 			}
 
+			// fixed: x5c/x5u headers are never trusted, always verify
+			// against the server's own pinned certificate
 			return legitPublicKey, nil
 		})
 
