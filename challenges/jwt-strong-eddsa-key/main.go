@@ -10,13 +10,19 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func generateToken() (string, error) {
+func generateToken(vulnerable bool) (string, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return "", err
 	}
 
-	privateKeyBytes, err := os.ReadFile(path.Join(cwd, "keys", "private_key.pem"))
+	keyFile := "private_key.pem"
+	if vulnerable {
+		// vulnerable: the key was generated from a predictable/low-entropy seed
+		keyFile = "weak_private_key.pem"
+	}
+
+	privateKeyBytes, err := os.ReadFile(path.Join(cwd, "keys", keyFile))
 	if err != nil {
 		return "", err
 	}

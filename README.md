@@ -29,6 +29,10 @@ git clone https://github.com/cerberauth/api-vulns-challenges.git
 
 4. Exploit the Vulnerability: Once the environment is set up, attempt to exploit the vulnerability as per the challenge instructions. Document your findings and the steps you took.
 
+### Vulnerable vs. fixed mode
+
+Every challenge server can run in two modes, toggled with the `--vulnerable` flag on its `serve` command (`--vulnerable=true` by default): the vulnerable mode reproduces the flaw the challenge is named after, while `--vulnerable=false` runs the fixed, non-vulnerable implementation of the same API. This lets you validate a scanner or exploit against the vulnerable server, then confirm it no longer works against the fixed one. See each challenge's README for the specific behavior difference between modes.
+
 5. Share Your Results: If you wish, you can share your findings, write-ups, or solutions by submitting a pull request to this repository.
 
 ## Challenges

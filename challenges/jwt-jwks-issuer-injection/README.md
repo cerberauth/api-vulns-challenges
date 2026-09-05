@@ -10,6 +10,18 @@ go run main.go serve
 
 This starts the vulnerable API on port 8080 and a mock legitimate identity provider (serving its real JWKS) on port 8090.
 
+## Modes
+
+The server supports two modes, toggled with the `--vulnerable` flag on the `serve` command (defaults to `true`):
+
+```bash
+# vulnerable: the issuer claim is used unchecked to build the JWKS URL to fetch
+go run main.go serve --vulnerable=true
+
+# fixed: the issuer claim is checked against an allowlist before being used
+go run main.go serve --vulnerable=false
+```
+
 ## How to exploit it
 
 ```bash

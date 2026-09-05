@@ -16,7 +16,7 @@ const (
 	VictimAudience = "a4f8c2e1-9b3d-4f5a-8c6e-1d2f3a4b5c6d"
 )
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -43,12 +43,17 @@ func RunServer(port string) {
 		// The relying party checks the Microsoft signature and issuer only.
 		// It never validates the audience, so an ID token minted by Microsoft
 		// for a different, attacker-controlled app is accepted here too.
+		parserOpts := []jwt.ParserOption{jwt.WithIssuer(Issuer)}
+		if !vulnerable {
+			parserOpts = append(parserOpts, jwt.WithAudience(VictimAudience))
+		}
+
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 			return idpPublicKey, nil
-		}, jwt.WithIssuer(Issuer))
+		}, parserOpts...)
 
 		if err != nil || !token.Valid {
 			fmt.Println(err)

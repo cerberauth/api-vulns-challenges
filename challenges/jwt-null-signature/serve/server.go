@@ -12,7 +12,7 @@ import (
 
 var secret = []byte("strong-hmac-secret")
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tokenString, ok := common.ExtractBearerToken(r)
@@ -27,7 +27,8 @@ func RunServer(port string) {
 			return
 		}
 
-		if len(parts[2]) == 0 {
+		if vulnerable && len(parts[2]) == 0 {
+			// VULNERABILITY: an empty signature segment is treated as valid
 			w.WriteHeader(204)
 			return
 		}

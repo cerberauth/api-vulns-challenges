@@ -8,6 +8,18 @@ This challenge demonstrates a JWT implementation that is vulnerable to SQL injec
 go run main.go serve
 ```
 
+## Modes
+
+The server supports two modes, toggled with the `--vulnerable` flag on the `serve` command (defaults to `true`):
+
+```bash
+# vulnerable: the kid header is concatenated directly into a SQL query
+go run main.go serve --vulnerable=true
+
+# fixed: the kid is passed as a bound query parameter
+go run main.go serve --vulnerable=false
+```
+
 ## How to exploit it
 
 ```bash

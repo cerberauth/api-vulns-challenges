@@ -78,7 +78,7 @@ func fetchJWKS(jkuURL string) (*jwks, error) {
 	return &set, nil
 }
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -110,6 +110,12 @@ func RunServer(port string) {
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+
+			if !vulnerable {
+				// fixed: the jku header is never trusted, the server always
+				// verifies against its own pinned, statically configured key
+				return legitPublicKey, nil
 			}
 
 			jkuURL, _ := token.Header["jku"].(string)

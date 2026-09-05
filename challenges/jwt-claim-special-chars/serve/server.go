@@ -35,7 +35,22 @@ func debugRecoveryMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func RunServer(port string) {
+// recoveryMiddleware is the fixed counterpart of debugRecoveryMiddleware: it
+// still recovers from panics so the server keeps running, but never leaks
+// the panic message or stack trace to the client.
+func recoveryMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if rec := recover(); rec != nil {
+				log.Println("recovered from panic:", rec)
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
+}
+
+func RunServer(port string, vulnerable bool) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
 		tokenString, ok := common.ExtractBearerToken(r)
@@ -56,16 +71,37 @@ func RunServer(port string) {
 		}
 
 		claims := token.Claims.(jwt.MapClaims)
-		rawFilter := claims["filter"].(string)
 
-		// The "filter" claim lets a client scope which of their own
-		// records get returned, so it's compiled straight into a regexp
-		// with MustCompile instead of Compile+error-check - nobody
-		// expected a claim to contain anything but a simple pattern.
-		// Special/meta characters that don't form valid regexp syntax
-		// (unbalanced brackets, braces, parens, a trailing backslash, ...)
-		// panic instead of being rejected as a bad filter.
-		filter := regexp.MustCompile(rawFilter)
+		var rawFilter string
+		if vulnerable {
+			rawFilter = claims["filter"].(string)
+		} else {
+			rawFilter, ok = claims["filter"].(string)
+			if !ok {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+		}
+
+		var filter *regexp.Regexp
+		if vulnerable {
+			// The "filter" claim lets a client scope which of their own
+			// records get returned, so it's compiled straight into a regexp
+			// with MustCompile instead of Compile+error-check - nobody
+			// expected a claim to contain anything but a simple pattern.
+			// Special/meta characters that don't form valid regexp syntax
+			// (unbalanced brackets, braces, parens, a trailing backslash, ...)
+			// panic instead of being rejected as a bad filter.
+			filter = regexp.MustCompile(rawFilter)
+		} else {
+			// fixed: invalid patterns are rejected instead of panicking
+			var err error
+			filter, err = regexp.Compile(rawFilter)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+		}
 
 		records := []string{"invoice-1001", "invoice-1002", "invoice-1003"}
 		matches := make([]string, 0, len(records))
@@ -80,5 +116,9 @@ func RunServer(port string) {
 	})
 
 	log.Println("Server started at port", port)
-	log.Fatal(http.ListenAndServe(":"+port, common.SecurityHeadersMiddleware(debugRecoveryMiddleware(mux))))
+	recovery := debugRecoveryMiddleware
+	if !vulnerable {
+		recovery = recoveryMiddleware
+	}
+	log.Fatal(http.ListenAndServe(":"+port, common.SecurityHeadersMiddleware(recovery(mux))))
 }

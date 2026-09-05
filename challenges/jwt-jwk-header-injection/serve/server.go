@@ -46,7 +46,7 @@ func jwkFromHeader(raw interface{}) (*rsa.PublicKey, error) {
 	}, nil
 }
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -79,10 +79,12 @@ func RunServer(port string) {
 			// trusted as the verification key instead of being checked
 			// against the server's own pinned key. Any token can carry its
 			// own key and sign itself with it.
-			if rawJWK, present := token.Header["jwk"]; present {
+			if rawJWK, present := token.Header["jwk"]; vulnerable && present {
 				return jwkFromHeader(rawJWK)
 			}
 
+			// fixed: the jwk header is never trusted, always verify against
+			// the server's own pinned key
 			return legitPublicKey, nil
 		})
 

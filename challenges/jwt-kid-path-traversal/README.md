@@ -8,6 +8,18 @@ This challenge demonstrates a JWT implementation that is vulnerable to path trav
 go run main.go serve
 ```
 
+## Modes
+
+The server supports two modes, toggled with the `--vulnerable` flag on the `serve` command (defaults to `true`):
+
+```bash
+# vulnerable: the kid header is used as-is to read a key file, allowing path traversal
+go run main.go serve --vulnerable=true
+
+# fixed: the kid is restricted to a file name within the keys directory
+go run main.go serve --vulnerable=false
+```
+
 ## How to exploit it
 
 ```bash

@@ -5,7 +5,16 @@ This challenge demonstrates a JWT implementation that is vulnerable to the 'none
 ## How to run it
 
 ```bash
-go run main.go
+go run main.go serve
+```
+
+## Modes
+
+The server supports two modes, toggled with the `--vulnerable` flag on the `serve` command (defaults to `true`):
+
+```bash
+go run main.go serve --vulnerable=true   # vulnerable: accepts tokens signed with alg "none"
+go run main.go serve --vulnerable=false  # fixed: only HMAC-signed tokens are accepted, alg "none" is rejected
 ```
 
 ## Disclaimer

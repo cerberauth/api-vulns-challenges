@@ -13,13 +13,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func readPublicKey() (crypto.PublicKey, error) {
+func readPublicKey(vulnerable bool) (crypto.PublicKey, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
 
-	publicKeyBytes, err := os.ReadFile(path.Join(cwd, "keys", "public_key.pem"))
+	keyFile := "public_key.pem"
+	if !vulnerable {
+		keyFile = "strong_public_key.pem"
+	}
+
+	publicKeyBytes, err := os.ReadFile(path.Join(cwd, "keys", keyFile))
 	if err != nil {
 		return nil, err
 	}
@@ -27,8 +32,8 @@ func readPublicKey() (crypto.PublicKey, error) {
 	return jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
 }
 
-func RunServer(port string) {
-	publicKey, err := readPublicKey()
+func RunServer(port string, vulnerable bool) {
+	publicKey, err := readPublicKey(vulnerable)
 	if err != nil {
 		log.Fatal(err)
 	}

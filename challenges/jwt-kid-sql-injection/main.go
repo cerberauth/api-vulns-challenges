@@ -11,7 +11,7 @@ import (
 const defaultKid = "default"
 const defaultSecret = "supersecretkey_stored_in_database"
 
-func generateToken() (string, error) {
+func generateToken(vulnerable bool) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":  "2cb307ba-bb46-4194-854f-4774046d9c9b",
 		"name": "John Doe",

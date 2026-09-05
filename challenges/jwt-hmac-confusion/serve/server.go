@@ -11,7 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -41,8 +41,10 @@ func RunServer(port string) {
 
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			// VULNERABILITY: accepts HMAC tokens using RSA public key as secret
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); ok {
-				return publicKeyBytes, nil
+			if vulnerable {
+				if _, ok := token.Method.(*jwt.SigningMethodHMAC); ok {
+					return publicKeyBytes, nil
+				}
 			}
 
 			if _, ok := token.Method.(*jwt.SigningMethodRSA); ok {

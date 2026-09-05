@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func RunServer(port string) {
+func RunServer(port string, vulnerable bool) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNoContent)
@@ -20,7 +20,12 @@ func RunServer(port string) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		if r.Method == http.MethodGet || r.Header.Get("X-HTTP-Method-Override") == http.MethodGet || r.URL.Query().Get("_method") == http.MethodGet {
+		// vulnerable: a GET-only endpoint can also be reached with the real
+		// method overridden via a header or query parameter, which lets an
+		// attacker bypass method-based access controls (e.g. a proxy/WAF
+		// rule that only inspects r.Method)
+		overridden := vulnerable && (r.Header.Get("X-HTTP-Method-Override") == http.MethodGet || r.URL.Query().Get("_method") == http.MethodGet)
+		if r.Method == http.MethodGet || overridden {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{"message": "GET method"}`))
 		} else {
@@ -30,13 +35,22 @@ func RunServer(port string) {
 
 	http.HandleFunc("/headers/cors-wildcard", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		if vulnerable {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+		} else {
+			w.Header().Set("Access-Control-Allow-Origin", "https://trusted.example.com")
+			w.Header().Set("Vary", "Origin")
+		}
 		w.WriteHeader(http.StatusNoContent)
 	})
 
 	http.HandleFunc("/headers/csp-frame-ancestors", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Content-Security-Policy", "frame-ancestors 'http://example.com'")
+		if vulnerable {
+			w.Header().Set("Content-Security-Policy", "frame-ancestors 'http://example.com'")
+		} else {
+			w.Header().Set("Content-Security-Policy", "frame-ancestors 'none'")
+		}
 		w.WriteHeader(http.StatusNoContent)
 	})
 
@@ -45,7 +59,7 @@ func RunServer(port string) {
 			Name:     "unsecure",
 			Value:    "unsecure",
 			SameSite: http.SameSiteStrictMode,
-			Secure:   false,
+			Secure:   !vulnerable,
 			HttpOnly: true,
 			Expires:  time.Now().Add(24 * time.Hour),
 		})
@@ -58,7 +72,7 @@ func RunServer(port string) {
 			Name:     "unsecure",
 			Value:    "unsecure",
 			SameSite: http.SameSiteStrictMode,
-			HttpOnly: false,
+			HttpOnly: !vulnerable,
 			Secure:   true,
 			Expires:  time.Now().Add(24 * time.Hour),
 		})
@@ -67,10 +81,14 @@ func RunServer(port string) {
 	})
 
 	http.HandleFunc("/cookies/samesite-none", func(w http.ResponseWriter, r *http.Request) {
+		sameSite := http.SameSiteNoneMode
+		if !vulnerable {
+			sameSite = http.SameSiteStrictMode
+		}
 		http.SetCookie(w, &http.Cookie{
 			Name:     "unsecure",
 			Value:    "unsecure",
-			SameSite: http.SameSiteNoneMode,
+			SameSite: sameSite,
 			HttpOnly: true,
 			Secure:   true,
 			Expires:  time.Now().Add(24 * time.Hour),
@@ -80,13 +98,17 @@ func RunServer(port string) {
 	})
 
 	http.HandleFunc("/cookies/no-expiration", func(w http.ResponseWriter, r *http.Request) {
-		http.SetCookie(w, &http.Cookie{
+		cookie := &http.Cookie{
 			Name:     "unsecure",
 			Value:    "unsecure",
 			SameSite: http.SameSiteStrictMode,
 			HttpOnly: true,
 			Secure:   true,
-		})
+		}
+		if !vulnerable {
+			cookie.Expires = time.Now().Add(24 * time.Hour)
+		}
+		http.SetCookie(w, cookie)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNoContent)
 	})

@@ -10,6 +10,18 @@ go run main.go serve
 
 This starts the vulnerable API on port 8080. The legit token flow embeds the server's own self-signed certificate in the `x5c` header, which the API also happens to accept — because it accepts *any* certificate presented in the header.
 
+## Modes
+
+The server supports two modes, toggled with the `--vulnerable` flag on the `serve` command (defaults to `true`):
+
+```bash
+# vulnerable: certificates supplied via the x5c/x5u headers are trusted with no chain-of-trust check
+go run main.go serve --vulnerable=true
+
+# fixed: the x5c/x5u headers are ignored, verification always uses the server's pinned certificate
+go run main.go serve --vulnerable=false
+```
+
 ## How to exploit it
 
 ### Via `x5c` (embedded self-signed cert chain)
