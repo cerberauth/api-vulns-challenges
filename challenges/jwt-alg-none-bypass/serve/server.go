@@ -9,6 +9,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// Secret is the HMAC secret used when the server runs in its fixed, non-vulnerable mode.
+const Secret = "my_secret_key"
+
 func RunServer(port string, vulnerable bool) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +31,7 @@ func RunServer(port string, vulnerable bool) {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 
-			return []byte("my_secret_key"), nil
+			return []byte(Secret), nil
 		})
 
 		if token != nil && token.Valid {
