@@ -1,0 +1,14 @@
+app.example.com {
+	# fixed: no server-side templating of proxied/reflected content
+
+	reverse_proxy backend:8080 {
+		# fixed: X-Forwarded-Host is set to the known canonical host instead
+		# of trusting the client-supplied value
+		header_up X-Forwarded-Host app.example.com
+	}
+
+	# fixed: directory listing disabled, only explicit files are served
+	file_server {
+		root /srv/static
+	}
+}

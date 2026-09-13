@@ -1,0 +1,26 @@
+# Traefik static configuration - fixed
+
+# fixed: the dashboard requires authentication and is not exposed on a
+# public entrypoint (served separately behind its own protected router)
+api:
+  dashboard: true
+  insecure: false
+
+entryPoints:
+  web:
+    address: ":80"
+  # fixed: forwarded headers are only trusted from the known, trusted proxy CIDR
+  websecure:
+    address: ":443"
+    forwardedHeaders:
+      trustedIPs:
+        - "10.0.0.0/8"
+
+http:
+  middlewares:
+    cors-restricted:
+      headers:
+        # fixed: a specific, trusted origin instead of a wildcard
+        accessControlAllowOriginList:
+          - "https://app.example.com"
+        accessControlAllowCredentials: true

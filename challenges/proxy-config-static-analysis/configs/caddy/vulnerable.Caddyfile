@@ -1,0 +1,18 @@
+app.example.com {
+	# vulnerable: the templates directive evaluates Go template syntax in
+	# any response, including reflected request headers, enabling SSTI
+	# (see the proxy-template-injection challenge)
+	templates
+
+	reverse_proxy backend:8080 {
+		# vulnerable: the client-controlled X-Forwarded-Host is forwarded
+		# upstream unmodified, letting the backend be tricked into
+		# generating links/redirects that point at an attacker-chosen host
+		header_up X-Forwarded-Host {http.request.header.X-Forwarded-Host}
+	}
+
+	# vulnerable: directory listing is enabled on a static file path
+	file_server browse {
+		root /srv/static
+	}
+}
