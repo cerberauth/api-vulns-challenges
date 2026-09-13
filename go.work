@@ -28,6 +28,24 @@ use (
 	./challenges/jwt-weak-hmac-secret
 	./challenges/jwt-weak-rsa-key
 	./challenges/jwt-x5c-x5u-header-injection
+	./challenges/cache-conditional-validators
+	./challenges/cache-control-directive-validation
+	./challenges/cache-cpdos-header-oversize
+	./challenges/cache-cpdos-meta-character
+	./challenges/cache-cpdos-method-override
+	./challenges/cache-deception-delimiter
+	./challenges/cache-deception-normalization
+	./challenges/cache-deception-static-directory
+	./challenges/cache-deception-static-extension
+	./challenges/cache-freshness-heuristic
+	./challenges/cache-key-explosion-dos
+	./challenges/cache-poisoning-fat-get
+	./challenges/cache-poisoning-key-collision
+	./challenges/cache-poisoning-parameter-cloaking
+	./challenges/cache-poisoning-unkeyed-header
+	./challenges/cache-sensitive-data-exposure
+	./challenges/cache-stale-directive-bypass
+	./challenges/cache-vary-misconfiguration
 	./challenges/proxy-cache-deception
 	./challenges/proxy-client-ip-spoofing
 	./challenges/proxy-cors-misconfiguration
