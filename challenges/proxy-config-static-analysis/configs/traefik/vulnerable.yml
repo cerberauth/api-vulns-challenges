@@ -1,0 +1,26 @@
+# Traefik static configuration - vulnerable
+
+# vulnerable: the API/dashboard is exposed without authentication and
+# reachable on the same entrypoint as public traffic
+api:
+  dashboard: true
+  insecure: true
+
+entryPoints:
+  web:
+    address: ":80"
+  # vulnerable: forwarded headers (X-Forwarded-For, X-Forwarded-Host) are
+  # trusted from any client, not just from known upstream proxies
+  websecure:
+    address: ":443"
+    forwardedHeaders:
+      insecure: true
+
+http:
+  middlewares:
+    cors-open:
+      headers:
+        # vulnerable: wildcard origin combined with credentials
+        accessControlAllowOriginList:
+          - "*"
+        accessControlAllowCredentials: true

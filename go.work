@@ -1,4 +1,4 @@
-go 1.26
+go 1.26.0
 
 use (
 	./challenges/auth-not-verified
@@ -28,6 +28,20 @@ use (
 	./challenges/jwt-weak-hmac-secret
 	./challenges/jwt-weak-rsa-key
 	./challenges/jwt-x5c-x5u-header-injection
+	./challenges/proxy-cache-deception
+	./challenges/proxy-client-ip-spoofing
+	./challenges/proxy-cors-misconfiguration
+	./challenges/proxy-host-header-injection
+	./challenges/proxy-http2-authority-spoofing
+	./challenges/proxy-info-disclosure
+	./challenges/proxy-open-ssrf
+	./challenges/proxy-path-bypass
+	./challenges/proxy-rate-limit-bypass
+	./challenges/proxy-request-smuggling
+	./challenges/proxy-security-headers
+	./challenges/proxy-template-injection
+	./challenges/proxy-tls-misconfiguration
+	./challenges/proxy-waf-bypass
 	./challenges/strong-api-key
 	./challenges/strong-http-basic
 	./common
