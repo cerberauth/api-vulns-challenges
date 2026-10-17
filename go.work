@@ -25,6 +25,7 @@ use (
 	./challenges/jwt-null-signature
 	./challenges/jwt-psychic-signature
 	./challenges/jwt-strong-eddsa-key
+	./challenges/jwt-timestamp-tampering
 	./challenges/jwt-weak-hmac-secret
 	./challenges/jwt-weak-rsa-key
 	./challenges/jwt-x5c-x5u-header-injection

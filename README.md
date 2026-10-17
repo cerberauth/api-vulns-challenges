@@ -82,6 +82,7 @@ The following challenges are available in this repository:
 - [JWT Null Signature](challenges/jwt-null-signature)
 - [JWT Psychic Signature](challenges/jwt-psychic-signature)
 - [JWT Strong EdDSA Key](challenges/jwt-strong-eddsa-key)
+- [JWT Timestamp Tampering](challenges/jwt-timestamp-tampering)
 - [JWT Weak HMAC Secret](challenges/jwt-weak-hmac-secret)
 - [JWT Weak RSA Key](challenges/jwt-weak-rsa-key)
 - [JWT x5c/x5u Header Injection](challenges/jwt-x5c-x5u-header-injection)
