@@ -63,5 +63,16 @@ use (
 	./challenges/proxy-waf-bypass
 	./challenges/strong-api-key
 	./challenges/strong-http-basic
+	./challenges/auth-unauthenticated-endpoint
+	./challenges/jwt-claim-removal
+	./challenges/jwt-hmac-confusion-jwks
+	./challenges/jwt-issuer-not-validated
+	./challenges/jwt-kid-command-injection
+	./challenges/jwt-kid-ldap-injection
+	./challenges/jwt-long-lifetime
+	./challenges/jwt-missing-expiry
+	./challenges/jwt-scope-not-validated
+	./challenges/tls-certificate-misconfiguration
+	./challenges/tls-http-accepted
 	./common
 )
