@@ -115,6 +115,7 @@ The following challenges are available in this repository:
 - [Strong HTTP Basic](challenges/strong-http-basic)
 - [TLS Certificate Misconfiguration](challenges/tls-certificate-misconfiguration)
 - [TLS HTTP Accepted](challenges/tls-http-accepted)
+- [TLS Known CVEs](challenges/tls-known-cves)
 - [TLS Weak DH](challenges/tls-weak-dh)
 
 ## Contributing

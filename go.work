@@ -2,33 +2,7 @@ go 1.26.0
 
 use (
 	./challenges/auth-not-verified
-	./challenges/discoverable
-	./challenges/http-misconfigurations
-	./challenges/jwt-alg-none-bypass
-	./challenges/jwt-apple-token-relay
-	./challenges/jwt-blank-secret
-	./challenges/jwt-claim-oversized-value
-	./challenges/jwt-claim-special-chars
-	./challenges/jwt-claim-type-confusion
-	./challenges/jwt-cross-service-relay
-	./challenges/jwt-facebook-token-relay
-	./challenges/jwt-google-token-relay
-	./challenges/jwt-hmac-confusion
-	./challenges/jwt-issuer-confusion
-	./challenges/jwt-jku-header-injection
-	./challenges/jwt-jwk-header-injection
-	./challenges/jwt-jwks-issuer-injection
-	./challenges/jwt-kid-path-traversal
-	./challenges/jwt-kid-sql-injection
-	./challenges/jwt-microsoft-token-relay
-	./challenges/jwt-not-verified
-	./challenges/jwt-null-signature
-	./challenges/jwt-psychic-signature
-	./challenges/jwt-strong-eddsa-key
-	./challenges/jwt-timestamp-tampering
-	./challenges/jwt-weak-hmac-secret
-	./challenges/jwt-weak-rsa-key
-	./challenges/jwt-x5c-x5u-header-injection
+	./challenges/auth-unauthenticated-endpoint
 	./challenges/cache-conditional-validators
 	./challenges/cache-control-directive-validation
 	./challenges/cache-cpdos-header-oversize
@@ -47,6 +21,41 @@ use (
 	./challenges/cache-sensitive-data-exposure
 	./challenges/cache-stale-directive-bypass
 	./challenges/cache-vary-misconfiguration
+	./challenges/discoverable
+	./challenges/http-misconfigurations
+	./challenges/jwt-alg-none-bypass
+	./challenges/jwt-apple-token-relay
+	./challenges/jwt-blank-secret
+	./challenges/jwt-claim-oversized-value
+	./challenges/jwt-claim-removal
+	./challenges/jwt-claim-special-chars
+	./challenges/jwt-claim-type-confusion
+	./challenges/jwt-cross-service-relay
+	./challenges/jwt-facebook-token-relay
+	./challenges/jwt-google-token-relay
+	./challenges/jwt-hmac-confusion
+	./challenges/jwt-hmac-confusion-jwks
+	./challenges/jwt-issuer-confusion
+	./challenges/jwt-issuer-not-validated
+	./challenges/jwt-jku-header-injection
+	./challenges/jwt-jwk-header-injection
+	./challenges/jwt-jwks-issuer-injection
+	./challenges/jwt-kid-command-injection
+	./challenges/jwt-kid-ldap-injection
+	./challenges/jwt-kid-path-traversal
+	./challenges/jwt-kid-sql-injection
+	./challenges/jwt-long-lifetime
+	./challenges/jwt-microsoft-token-relay
+	./challenges/jwt-missing-expiry
+	./challenges/jwt-not-verified
+	./challenges/jwt-null-signature
+	./challenges/jwt-psychic-signature
+	./challenges/jwt-scope-not-validated
+	./challenges/jwt-strong-eddsa-key
+	./challenges/jwt-timestamp-tampering
+	./challenges/jwt-weak-hmac-secret
+	./challenges/jwt-weak-rsa-key
+	./challenges/jwt-x5c-x5u-header-injection
 	./challenges/proxy-cache-deception
 	./challenges/proxy-client-ip-spoofing
 	./challenges/proxy-cors-misconfiguration
@@ -63,16 +72,8 @@ use (
 	./challenges/proxy-waf-bypass
 	./challenges/strong-api-key
 	./challenges/strong-http-basic
-	./challenges/auth-unauthenticated-endpoint
-	./challenges/jwt-claim-removal
-	./challenges/jwt-hmac-confusion-jwks
-	./challenges/jwt-issuer-not-validated
-	./challenges/jwt-kid-command-injection
-	./challenges/jwt-kid-ldap-injection
-	./challenges/jwt-long-lifetime
-	./challenges/jwt-missing-expiry
-	./challenges/jwt-scope-not-validated
 	./challenges/tls-certificate-misconfiguration
 	./challenges/tls-http-accepted
+	./challenges/tls-known-cves
 	./common
 )
